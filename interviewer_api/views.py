@@ -16,6 +16,8 @@ from .serializers import (
     AnswerSerializer,
 )
 
+from .parse_interviewer import parser
+
 class GenerateCategoryQuestionsView(APIView):
     permission_classes = [permissions.IsAuthenticated]
 
@@ -51,9 +53,9 @@ class ResumeUploadView(CreateAPIView):
 
     def perform_create(self, serializer):
         resume = serializer.save(owner=self.request.user)
-        # parsed = parse_resume(resume.file.path)
-        # resume.parsed_text = parsed
-        # resume.save()
+        parsed = parser(resume.file.path)
+        resume.parsed_text = parsed
+        resume.save()
 
 
 class GenerateSessionQuestionsView(APIView):
