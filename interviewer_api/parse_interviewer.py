@@ -15,7 +15,7 @@ except Exception as err:
     print(f"Unable to load the model: {err}")
     nlp = spacy.blank("en")  
 
-
+# Extract raw text from a PDF
 def text_extractor(pdf_path):
     try:
         return extract_text(pdf_path)
@@ -23,7 +23,7 @@ def text_extractor(pdf_path):
         print(f"Error reading {pdf_path}: {err}")
         return ""
 
-
+# Use spaCy model to identify structured entities in resume text
 def identifier(text):
     doc = nlp(text)
     return [
@@ -35,7 +35,7 @@ def identifier(text):
         }
     ]
 
-
+# Format identified entities into a structured dictionary
 def format_resume_data(parsed_data):
     grouped = defaultdict(set)
     for value, label in parsed_data:
@@ -53,6 +53,9 @@ def format_resume_data(parsed_data):
 
     return resume_data
 
+
+
+# Main parser to extract and structure resume data from PDF in a folder
 def parser(folder_path):
     #Store only one file at a time in the folder, will integrate it with a databse    
     pdf_file = None
@@ -79,7 +82,7 @@ model = AutoModelForCausalLM.from_pretrained(
     torch_dtype=torch.float16
 )
 
-
+# Create a prompt using resume and job info to generate questions
 def build_prompt(resume,job):
     example = """
 Example Resume:
@@ -113,6 +116,8 @@ Questions:
     return current.strip()
 
 
+
+# Run the LLM to generate interview questions from the prompt
 def generate_questions(prompt):
     inputs = tokenizer(prompt, return_tensors="pt").to(model.device)
     outputs = model.generate(
@@ -126,7 +131,7 @@ def generate_questions(prompt):
     return tokenizer.decode(outputs[0], skip_special_tokens=True)
 
 resume_data = parser(folder_path)
-job = 
+job =" "  #under process
 prompt = build_prompt(resume_data,job)
 
 def execute(prompt): 
