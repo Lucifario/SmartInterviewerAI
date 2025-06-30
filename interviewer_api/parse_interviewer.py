@@ -136,8 +136,8 @@ prompt = build_prompt(resume_data,job)
 
 def execute(prompt): 
     output = generate_questions(prompt)
-    return print(output)
+    return output
 
 
-execute(prompt)
+
 
