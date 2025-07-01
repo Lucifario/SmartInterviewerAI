@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <style>
+    body { font-family: sans-serif; padding: 20px; }
+    h1, h2 { color: #333; }
+    .question { margin-bottom: 1.5em; }
+    .metrics { font-size: 0.9em; color: #555; }
+  </style>
+</head>
+<body>
+  <h1>Interview Report — Session {{ report.session_id }}</h1>
+  <p><strong>Role:</strong> {{ report.role }}</p>
+  <p><strong>Started:</strong> {{ report.started_at }}</p>
+  <p><strong>Finished:</strong> {{ report.finished_at }}</p>
+  <h2>Questions & Analysis</h2>
+  {% for q in report.questions %}
+    <div class="question">
+      <p><strong>Q{{ forloop.counter }}:</strong> {{ q.question_text }}</p>
+      <p><em>Transcript:</em> {{ q.transcript }}</p>
+      <div class="metrics">
+        Tone: {{ q.tone_score }} | Speed: {{ q.pace_wpm }} WPM | 
+        Fluency: {{ q.fluency_score }} | Relevance: {{ q.relevance_score }}
+      </div>
+    </div>
+  {% endfor %}
+  <h2>Overall Score: {{ report.overall_score|floatformat:2 }}</h2>
+  <h3>Suggestions</h3>
+  <ul>
+    {% for tip in report.suggestions %}
+      <li>{{ tip }}</li>
+    {% endfor %}
+  </ul>
+</body>
+</html>
