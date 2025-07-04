@@ -2,16 +2,40 @@
 __pycache__/
 *.py[cod]
 *.env
+*.log
 
-# Virtualenv
-env1/
+# Virtual Environments
 venv/
+env/
+env1/
+smartinterviewer/        # Ignore full env if it's inside your project
+*smartinterviewer/Lib/
+smartinterviewer/Scripts/
+smartinterviewer/include/
 
 # Django
 *.sqlite3
 /media/
 staticfiles/
+*.db
+*.pot
+*.pyc
 
-# IDEs & OS
+# Django Migrations
+*/migrations/__pycache__/
+*/migrations/*.py[cod]
+
+# dotenv
+.env
+.env.*
+
+# IDEs
 .vscode/
+.idea/
+
+# macOS & Windows system files
 .DS_Store
+Thumbs.db
+
+# Git
+.git/

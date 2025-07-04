@@ -32,6 +32,6 @@ class InterviewSessionAdmin(admin.ModelAdmin):
 
 @admin.register(Resume)
 class ResumeAdmin(admin.ModelAdmin):
-    list_display = ['id', 'owner', 'uploaded_at']
-    list_filter  = ['owner__profile__preferred_role']
+    list_display = ['id', 'user', 'created_at']
+    list_filter  = ['user__profile__preferred_role']
     search_fields= ['file']

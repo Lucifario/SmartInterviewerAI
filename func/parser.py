@@ -12,7 +12,7 @@ try:
     nlp = spacy.load(model_path)
 except Exception as err:
     print(f"Unable to load the model: {err}")
-    nlp = spacy.blank("en")  
+    nlp = spacy.blank("en_core_web_trf")  
 
 # Extract raw text from a PDF
 def text_extractor(pdf_path):
@@ -53,7 +53,7 @@ def format_resume_data(parsed_data):
     return resume_data
 
 # Main parser to extract and structure resume data from PDF in a folder
-def parser(folder_path):
+def parse_resume_file(folder_path):
     #Store only one file at a time in the folder, will integrate it with a databse    
     pdf_file = None
     for file in os.listdir(folder_path):
@@ -102,8 +102,7 @@ Experience: {resume.get("experience")}
 Education: {resume.get("education")}
 
 Instructions:
-Generate 10 smart, in-depth interview questions that mix technical and HR-style probing, based on the resume and given job role {job.get("job")}.
-
+Generate 10 smart, in-depth interview questions that mix technical and HR-style probing, based on the resume and given job role "{job}".
 Questions:
 1.
 """
@@ -125,9 +124,9 @@ def generate_questions(prompt):
     )
     return tokenizer.decode(outputs[0], skip_special_tokens=True)
 
-resume_data = parser(folder_path)
+resume_data = parse_resume_file(folder_path)
 job =" "  #under process
-prompt = build_prompt(resume_data,job)
+# prompt = build_prompt(resume_data,job)
 
 #final execution
 def execute(prompt): 

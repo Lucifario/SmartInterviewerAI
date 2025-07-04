@@ -60,6 +60,7 @@ class InterviewSession(models.Model):
     user=models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='interview_sessions')
     started_at=models.DateTimeField(auto_now_add=True)
     ended_at=models.DateTimeField(blank=True, null=True)
+    finished_at = models.DateTimeField(null=True, blank=True)
     def __str__(self):
         return f"Session {self.id} for {self.user.username} started at {self.started_at}"
 
