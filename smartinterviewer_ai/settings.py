@@ -61,6 +61,7 @@ INSTALLED_APPS = [
     'dj_rest_auth.registration',
     'django.contrib.sites',
     'rest_framework.authtoken',
+    'drf_yasg',
 ]
 
 SITE_ID = 1
@@ -111,6 +112,11 @@ REST_FRAMEWORK = {
         'rest_framework.filters.SearchFilter',
         'rest_framework.filters.OrderingFilter',
     ],
+    'DEFAULT_RENDERER_CLASSES': [
+        'rest_framework.renderers.JSONRenderer',
+        'rest_framework.renderers.BrowsableAPIRenderer',
+    ],
+    'DEFAULT_SCHEMA_CLASS': 'rest_framework.schemas.coreapi.AutoSchema',
 }
 
 SIMPLE_JWT = {
