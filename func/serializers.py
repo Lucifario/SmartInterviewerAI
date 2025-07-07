@@ -49,7 +49,7 @@ class InterviewHistorySerializer(serializers.ModelSerializer):
     pdf_report_url      = serializers.SerializerMethodField()
     class Meta:
         model= InterviewSession
-        fields= ['id', 'started_at', 'finished_at', 'total_questions', 'answered_questions', 'analysis_url', 'pdf_report_url']
+        fields= ['id', 'started_at', 'ended_at', 'total_questions', 'answered_questions', 'analysis_url', 'pdf_report_url']
     def get_total_questions(self, obj):
         return obj.questions.count()
     def get_answered_questions(self, obj):

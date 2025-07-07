@@ -44,11 +44,16 @@ class StartInterviewSessionView(APIView):
     def post(self, request, session_id):
         session = get_object_or_404(InterviewSession, id=session_id, user=request.user)
         resume = request.user.resumes.order_by('-created_at').first()
+        
+        # Parse and save resume data
         parsed = parse_resume_file(resume.resume_file.path)
         resume.parsed_text = json.dumps(parsed)
         resume.save()
+        
+        # Generate questions if none exist
         if not session.questions.exists():
-            execute(session, resume.resume_file.path)
+            execute(session, resume.resume_file.path)  # Fixed function call
+        
         session_data = InterviewSessionSerializer(session).data
         first_q = session.questions.order_by('created_at').first()
         question_data = QuestionSerializer(first_q).data
@@ -79,7 +84,6 @@ class SubmitAnswerView(CreateAPIView):
             message = f"Your answer for question '{question.text[:30]}…' was submitted and is being analyzed."
         )
 
-
 class SessionAnalysisView(APIView):
     permission_classes = [permissions.IsAuthenticated]
     def get(self, request, session_id):
@@ -108,12 +112,18 @@ class SessionAnalysisView(APIView):
                                 f"Question '{question.text[:30]}...' could use more relevance."
                             )
         overall = sum(scores) / len(scores) if scores else 0
+        
+        # Fixed profile access with error handling
+        role = 'Unknown'
+        if hasattr(request.user, 'profile') and request.user.profile:
+            role = request.user.profile.get_preferred_role_display()
+        
         report_payload = {
             'session_id':   session.id,
-            'role':         request.user.profile.get_preferred_role_display(),
+            'role':         role,
             'started_at':   session.started_at,
-            'finished_at':  session.finished_at,
-            'questions':    detailed,            # embed the detailed list here
+            'ended_at':     session.ended_at,  # Fixed field name
+            'questions':    detailed,
             'overall_score': overall,
             'suggestions':   suggestions or ["Great job! Keep it up."],
         }
@@ -165,6 +175,7 @@ class NotificationListView(generics.ListAPIView):
     permission_classes = [permissions.IsAuthenticated]
     def get_queryset(self):
         return Notification.objects.filter(user=self.request.user).order_by('-created_at')
+        
 class NotificationMarkReadView(APIView):
     permission_classes = [permissions.IsAuthenticated]
     def post(self, request, notification_id):
