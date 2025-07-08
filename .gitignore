@@ -12,6 +12,7 @@ smartinterviewer/        # Ignore full env if it's inside your project
 *smartinterviewer/Lib/
 smartinterviewer/Scripts/
 smartinterviewer/include/
+smart_env/
 
 # Django
 *.sqlite3
