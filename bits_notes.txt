@@ -1,0 +1,11 @@
+{"refresh":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoicmVmcmVzaCIsImV4cCI6MTc1MTkxNDgwMCwiaWF0IjoxNzUxODI4NDAwLCJqdGkiOiJjYzcxYjE5MDNmYjg0MjRiYTY5Y2FkOWU5NDlhYWY2OSIsInVzZXJfaWQiOjV9.udDrQaiwPoGm-Pgh7magsoeld35AbEubWWfp0cwIgaM","access":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzUxODM5MjAwLCJpYXQiOjE3NTE4Mjg0MDAsImp0aSI6ImVkYjhmYTZhMjY2MzQwMzFhMGQzMzI0NzEwZGY2YTgzIiwidXNlcl9pZCI6NX0.rID80eTO1oMX6CACJCvZZ4qrXSA_s1IsK9HIqqpNSRQ"}
+
+
+
+resume-
+
+{"id":1,"file":"http://127.0.0.1:8000/media/resumes/GouravMittalResume_HkITk5W.pdf","parsed_text":"{\"error\": \"'Resume' object has no attribute 'resume_file'\"}","uploaded_at":"2025-07-07T00:31:55.125682+05:30","session_id":"44a88536-07a0-48ff-ad77-3e555bfbee59"}
+
+question - 
+
+{"session":{"id":"44a88536-07a0-48ff-ad77-3e555bfbee59","started_at":"2025-07-07T00:31:55.279909+05:30","finished_at":null},"first_question":{"id":"f902a4b7-b315-4e82-a62f-b11d7e8fb378","session":"44a88536-07a0-48ff-ad77-3e555bfbee59","text":"What are some common challenges faced by backend developers when working with cloud platforms? How do you think these challenges can be addressed effectively to improve efficiency and reduce costs for companies operating on the cloud? Explain your answer using specific examples from real-world scenarios.","created_at":"2025-07-07T13:05:42.138295+05:30"}}
