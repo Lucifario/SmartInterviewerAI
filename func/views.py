@@ -7,7 +7,7 @@ from rest_framework.generics import CreateAPIView, RetrieveUpdateAPIView, ListAP
 from rest_framework.parsers import MultiPartParser, FormParser, JSONParser
 from .models import InterviewSession, Notification, Question
 from .serializers import NotificationSerializer, QuestionAdminSerializer, UserSerializer, ResumeSerializer, InterviewSessionSerializer, QuestionSerializer, AnswerSerializer, InterviewHistorySerializer, UserSignupSerializer
-from .tasks import full_answer_analysis
+from django_q.tasks import async_task
 from .parser import parse_resume_file, execute
 from django.template.loader import render_to_string
 from django.http import HttpResponse
@@ -94,7 +94,7 @@ class SubmitAnswerView(CreateAPIView):
         question = get_object_or_404(Question, id=self.kwargs['question_id'], session__user=self.request.user)
         answer   = serializer.save(question=question)
         # **kick off** the full pipeline
-        full_answer_analysis.delay(str(answer.id))
+        async_task('func.tasks.full_answer_analysis', str(answer.id))
         Notification.objects.create(
             user    = self.request.user,
             session = question.session,

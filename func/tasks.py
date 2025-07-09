@@ -5,7 +5,7 @@ from .models import Answer, AnswerAnalysis, InterviewSession, Notification
 from .transcriber import transcribe   # your whisper logic
 from .analyzer import analyze         # your LLM logic
 
-@shared_task
+
 def full_answer_analysis(answer_id):
     """
     1) Transcribe the saved audio with timestamps

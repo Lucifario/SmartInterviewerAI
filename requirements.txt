@@ -2,10 +2,14 @@ accelerate==1.8.1
 altgraph==0.17.2
 amqp==5.3.1
 annotated-types==0.7.0
+ansicon==1.89.0
 anyio==4.9.0
+arrow==1.3.0
 asgiref==3.8.1
 billiard==4.2.1
+blessed==1.21.0
 blis==1.3.0
+blobfile==3.0.0
 Brotli==1.1.0
 catalogue==2.0.10
 celery==5.5.3
@@ -29,6 +33,8 @@ Django==4.2.23
 django-allauth==65.9.0
 django-cors-headers==4.7.0
 django-filter==25.1
+django-picklefield==3.3
+django-q==1.3.9
 django-rest-passwordreset==1.5.0
 djangorestframework==3.16.0
 djangorestframework_simplejwt==5.5.0
@@ -43,10 +49,12 @@ h11==0.16.0
 huggingface-hub==0.33.2
 idna==3.10
 Jinja2==3.1.6
+jinxed==1.3.0
 kombu==5.5.4
 langcodes==3.5.0
 language_data==1.3.0
 llvmlite==0.44.0
+lxml==6.0.0
 macholib==1.15.2
 marisa-trie==1.2.1
 markdown-it-py==3.0.0
@@ -68,6 +76,7 @@ prompt_toolkit==3.0.51
 protobuf==6.31.1
 psutil==7.0.0
 pycparser==2.22
+pycryptodomex==3.23.0
 pydantic==2.11.4
 pydantic_core==2.33.2
 pydyf==0.11.0
@@ -78,11 +87,12 @@ pyphen==0.17.2
 python-dateutil==2.9.0.post0
 python-dotenv==1.1.1
 PyYAML==6.0.2
-redis==6.2.0
+redis==3.5.3
 regex==2024.11.6
 requests==2.32.4
 rich==14.0.0
 safetensors==0.5.3
+sentencepiece==0.2.0
 setuptools==80.9.0
 shellingham==1.5.4
 six==1.17.0
@@ -107,6 +117,7 @@ torch==2.7.1
 tqdm==4.67.1
 transformers==4.49.0
 typer==0.16.0
+types-python-dateutil==2.9.0.20250708
 typing-inspection==0.4.0
 typing_extensions==4.13.2
 tzdata==2025.2

@@ -50,6 +50,7 @@ INSTALLED_APPS = [
     'django_rest_passwordreset',
     'corsheaders',
     'func',
+    'django_q',
     'django_filters',
     'rest_framework_simplejwt.token_blacklist',
     'allauth',
@@ -228,3 +229,14 @@ MEDIA_ROOT = BASE_DIR / 'media'
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+Q_CLUSTER = {
+    'name': 'smartinterviewer',
+    'workers': 4,
+    'recycle': 500,
+    'timeout': 60,
+    'retry': 120,
+    'queue_limit': 50,
+    'bulk': 10,
+    'orm': 'default',  # Use the Django ORM + DB as broker
+}
