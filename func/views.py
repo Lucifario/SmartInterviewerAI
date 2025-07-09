@@ -4,7 +4,7 @@ from rest_framework import status, permissions, viewsets, generics
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.generics import CreateAPIView, RetrieveUpdateAPIView, ListAPIView
-from rest_framework.parsers import MultiPartParser, FormParser
+from rest_framework.parsers import MultiPartParser, FormParser, JSONParser
 from .models import InterviewSession, Notification, Question
 from .serializers import NotificationSerializer, QuestionAdminSerializer, UserSerializer, ResumeSerializer, InterviewSessionSerializer, QuestionSerializer, AnswerSerializer, InterviewHistorySerializer, UserSignupSerializer
 from .tasks import full_answer_analysis
@@ -24,9 +24,9 @@ class ResumeUploadView(CreateAPIView):
     permission_classes = [permissions.IsAuthenticated]
     parser_classes = [MultiPartParser, FormParser]
     def perform_create(self, serializer):
-        resume = serializer.save(user=self.request.user)
+        resume = serializer.save(owner=self.request.user)
         try:
-            parsed = parse_resume_file(resume.resume_file.path)
+            parsed = parse_resume_file(resume.file.path)
             resume.parsed_text = json.dumps(parsed)
             resume.save()
         except Exception as e:
@@ -39,19 +39,41 @@ class ResumeUploadView(CreateAPIView):
         resp.data['session_id'] = str(self.session_id)
         return resp
 
+from .parser import parse_resume_file, build_prompt, execute
+from .models import Question  # Assuming you have a Question model
+
 class StartInterviewSessionView(APIView):
     permission_classes = [permissions.IsAuthenticated]
+
     def post(self, request, session_id):
         session = get_object_or_404(InterviewSession, id=session_id, user=request.user)
-        resume = request.user.resumes.order_by('-created_at').first()
-        parsed = parse_resume_file(resume.resume_file.path)
+        resume = request.user.resume.order_by('-uploaded_at').first()
+
+        # 1. Parse the resume
+        parsed = parse_resume_file(resume.file.path)
         resume.parsed_text = json.dumps(parsed)
         resume.save()
+
+        # 2. Generate questions only if session doesn't have them
         if not session.questions.exists():
-            execute(session, resume.resume_file.path)
+            prompt = build_prompt(parsed, {"job": "Senior Backend Developer at Amazon"})  # Can be dynamic later
+            generated_output = execute(prompt)
+
+            # 3. Extract actual questions from LLM output (after "Questions:\n1. ...")
+            questions_block = generated_output.split("Questions:")[-1].strip()
+            questions = [q.strip() for q in questions_block.split("\n") if q.strip()]
+            
+            for q in questions:
+                # Remove numbering like "1." or "2."
+                clean_q = q.lstrip("0123456789. ").strip()
+                if clean_q:
+                    Question.objects.create(session=session, text=clean_q)
+
+        # 4. Return session and first question
         session_data = InterviewSessionSerializer(session).data
         first_q = session.questions.order_by('created_at').first()
-        question_data = QuestionSerializer(first_q).data
+        question_data = QuestionSerializer(first_q).data if first_q else {}
+
         return Response({'session': session_data, 'first_question': question_data}, status=status.HTTP_200_OK)
 
 class NextQuestionView(APIView):
@@ -66,7 +88,7 @@ class NextQuestionView(APIView):
 
 class SubmitAnswerView(CreateAPIView):
     serializer_class = AnswerSerializer
-    parser_classes   = [MultiPartParser, FormParser]
+    parser_classes   = [JSONParser]
     permission_classes = [permissions.IsAuthenticated]
     def perform_create(self, serializer):
         question = get_object_or_404(Question, id=self.kwargs['question_id'], session__user=self.request.user)

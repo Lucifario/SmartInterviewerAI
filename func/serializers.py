@@ -6,21 +6,37 @@ User = get_user_model()
 
 class UserSerializer(serializers.ModelSerializer):
     preferred_role = serializers.CharField(source='profile.role', required=False)
+
     class Meta:
-        model=User
-        fields=['id', 'username', 'email', 'preferred_role']
-        read_only_fields= ['id', 'username', 'email']
+        model = User
+        fields = ['id', 'username', 'email', 'preferred_role']
+        read_only_fields = ['id', 'username', 'email']
+
+    def update(self, instance, validated_data):
+        # Pop the nested profile data
+        profile_data = validated_data.pop('profile', {})
+        
+        # Update the User instance (though username/email are read-only)
+        instance = super().update(instance, validated_data)
+
+        # Update the Profile instance
+        profile = instance.profile
+        for attr, value in profile_data.items():
+            setattr(profile, attr, value)
+        profile.save()
+
+        return instance
 
 class ResumeSerializer(serializers.ModelSerializer):
     class Meta:
         model= Resume
-        fields= ['id', 'resume_file', 'parsed_text', 'uploaded_at']
+        fields= ['id', 'file', 'parsed_text', 'uploaded_at']
         read_only_fields= ['id', 'parsed_text', 'uploaded_at']
 
 class InterviewSessionSerializer(serializers.ModelSerializer):
     class Meta:
         model= InterviewSession
-        fields= ['id', 'started_at', 'ended_at']
+        fields= ['id', 'started_at', 'finished_at']
         read_only_fields= ['id', 'started_at', 'ended_at']
 
 class QuestionSerializer(serializers.ModelSerializer):

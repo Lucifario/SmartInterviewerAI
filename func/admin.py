@@ -27,11 +27,11 @@ class AnswerAnalysisAdmin(admin.ModelAdmin):
 @admin.register(InterviewSession)
 class InterviewSessionAdmin(admin.ModelAdmin):
     list_display = ['id', 'user', 'started_at', 'finished_at']
-    list_filter  = ['user__profile__preferred_role']
+    list_filter  = ['user']
     date_hierarchy = 'started_at'
 
 @admin.register(Resume)
 class ResumeAdmin(admin.ModelAdmin):
-    list_display = ['id', 'user', 'created_at']
-    list_filter  = ['user__profile__preferred_role']
+    list_display = ['id', 'owner', 'uploaded_at']
+    list_filter  = ['owner']
     search_fields= ['file']

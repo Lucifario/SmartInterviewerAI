@@ -27,7 +27,7 @@ urlpatterns = [
     path('auth/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('auth/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
     path('password-reset/', include('django_rest_passwordreset.urls', namespace='password_reset')),
-     path('dj-rest-auth/', include('dj_rest_auth.urls')),
+    path('dj-rest-auth/', include('dj_rest_auth.urls')),
     path('dj-rest-auth/registration/', include('dj_rest_auth.registration.urls')),
     path('accounts/', include('allauth.urls')),
 ]

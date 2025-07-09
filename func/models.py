@@ -47,19 +47,18 @@ def save_user_profile(sender, instance, **kwargs):
         Profile.objects.get_or_create(user=instance)
 
 class Resume(models.Model):
-    user=models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='resumes')
-    resume_file=models.FileField(upload_to='resumes/')
-    created_at=models.DateTimeField(auto_now_add=True)
+    owner=models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='resume')
+    file=models.FileField(upload_to='resume/')
+    uploaded_at=models.DateTimeField(auto_now_add=True)
     updated_at=models.DateTimeField(auto_now=True)
     parsed_text=models.TextField(blank=True, null=True)
     def __str__(self):
-        return f"{self.user.username} - Resume {self.id}"
+        return f"{self.owner.username} - Resume {self.id}"
     
 class InterviewSession(models.Model):
     id=models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     user=models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='interview_sessions')
     started_at=models.DateTimeField(auto_now_add=True)
-    ended_at=models.DateTimeField(blank=True, null=True)
     finished_at = models.DateTimeField(null=True, blank=True)
     def __str__(self):
         return f"Session {self.id} for {self.user.username} started at {self.started_at}"
