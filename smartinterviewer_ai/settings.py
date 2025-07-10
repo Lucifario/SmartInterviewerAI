@@ -51,6 +51,7 @@ INSTALLED_APPS = [
     'corsheaders',
     'func',
     'django_q',
+    'drf_spectacular',
     'django_filters',
     'rest_framework_simplejwt.token_blacklist',
     'allauth',
@@ -99,6 +100,7 @@ AUTHENTICATION_BACKENDS = [
 
 
 REST_FRAMEWORK = {
+    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'rest_framework_simplejwt.authentication.JWTAuthentication',
     ],
@@ -115,8 +117,8 @@ REST_FRAMEWORK = {
 }
 
 SIMPLE_JWT = {
-    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=180),
-    'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
+    'ACCESS_TOKEN_LIFETIME': timedelta(days=10),
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=10),
     'ROTATE_REFRESH_TOKENS': True,
     'BLACKLIST_AFTER_ROTATION': True,
     'UPDATE_LAST_LOGIN': False,
@@ -239,4 +241,11 @@ Q_CLUSTER = {
     'queue_limit': 50,
     'bulk': 10,
     'orm': 'default',  # Use the Django ORM + DB as broker
+}
+
+SPECTACULAR_SETTINGS = {
+    'TITLE': 'Smart Interviewer API',
+    'DESCRIPTION': 'API documentation for Smart Interviewer backend',
+    'VERSION': '1.0.0',
+    'SERVE_INCLUDE_SCHEMA': False,
 }
