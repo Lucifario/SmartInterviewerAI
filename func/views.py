@@ -139,8 +139,13 @@ class SessionAnalysisView(APIView):
             'overall_score': overall,
             'suggestions':   suggestions or ["Great job! Keep it up."],
         }
-        serializer = InterviewSessionSerializer(report_payload)
-        return Response(serializer.data, status=status.HTTP_200_OK)
+        serializer = InterviewSessionSerializer(report_payload)    
+        return Response({
+            "message": "SESSION ANALYSIS",
+            "data": serializer.data,
+            'status': status.HTTP_200_OK
+        }, status=status.HTTP_200_OK)
+        
 
 class SessionAnalysisPDFView(APIView):
     permission_classes = [permissions.IsAuthenticated]
@@ -193,7 +198,12 @@ class NotificationMarkReadView(APIView):
         notif = get_object_or_404(Notification, id=notification_id, user=request.user)
         notif.read = True
         notif.save()
-        return Response({'status': 'read'})
+        return Response({
+            "message": "read",
+            "data": "",
+            'status': 'read'
+        }, status=status.HTTP_200_OK)
+        
     
 class SignupView(generics.CreateAPIView):
     """
@@ -201,3 +211,14 @@ class SignupView(generics.CreateAPIView):
     """
     serializer_class = UserSignupSerializer
     permission_classes = [permissions.AllowAny]
+    
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        user = serializer.save()
+
+        return Response({
+            "message": "User registered successfully",
+            "data": self.get_serializer(user).data,
+            "status": status.HTTP_201_CREATED
+        }, status=status.HTTP_200_OK)
