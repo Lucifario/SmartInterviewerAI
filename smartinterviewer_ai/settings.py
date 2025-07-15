@@ -124,15 +124,15 @@ SIMPLE_JWT = {
     'UPDATE_LAST_LOGIN': False,
 }
 
-"""
+# EMAIL SETTINGS FOR MAILHOG
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST = 'smtp.sendgrid.net'
-EMAIL_HOST_USER = 'apikey'  # literally 'apikey'
-EMAIL_HOST_PASSWORD = 'YOUR_SENDGRID_API_KEY'
-EMAIL_PORT = 587
-EMAIL_USE_TLS = True
-DEFAULT_FROM_EMAIL = 'Smart Interviewer <no-reply@yourdomain.com>'
-"""
+EMAIL_HOST = 'localhost'             # MailHog runs on same server
+EMAIL_PORT = 1025                    # Default SMTP port for MailHog
+EMAIL_HOST_USER = ''
+EMAIL_HOST_PASSWORD = ''
+EMAIL_USE_TLS = False
+DEFAULT_FROM_EMAIL = 'Smart Interviewer <noreply@smartinterviewer.local>'
+
 
 MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',
@@ -168,7 +168,7 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'smartinterviewer_ai.wsgi.application'
 
-EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+# EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
@@ -205,8 +205,6 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-CELERY_BROKER_URL = 'redis://localhost:6379/0'
-CELERY_RESULT_BACKEND = 'redis://localhost:6379/0'
 
 # Internationalization
 # https://docs.djangoproject.com/en/4.2/topics/i18n/
