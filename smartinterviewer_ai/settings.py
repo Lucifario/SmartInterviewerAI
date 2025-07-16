@@ -73,7 +73,7 @@ ACCOUNT_EMAIL_REQUIRED = True
 ACCOUNT_USERNAME_REQUIRED = False
 
 # Signup fields (only email and password)
-ACCOUNT_SIGNUP_FIELDS = ['email', 'password1', 'password2']
+ACCOUNT_SIGNUP_FIELDS = ['email*', 'password1', 'password2']
 
 ACCOUNT_EMAIL_VERIFICATION = 'mandatory'
 LOGIN_REDIRECT_URL = '/dashboard/'
