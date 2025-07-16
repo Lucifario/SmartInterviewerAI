@@ -66,9 +66,16 @@ INSTALLED_APPS = [
 ]
 
 SITE_ID = 1
+
+# Force email login
+ACCOUNT_AUTHENTICATION_METHOD = 'email'
+ACCOUNT_EMAIL_REQUIRED = True
+ACCOUNT_USERNAME_REQUIRED = False
+
+# Signup fields (only email and password)
+ACCOUNT_SIGNUP_FIELDS = ['email', 'password1', 'password2']
+
 ACCOUNT_EMAIL_VERIFICATION = 'mandatory'
-ACCOUNT_LOGIN_METHODS = {'email'}
-ACCOUNT_SIGNUP_FIELDS = ['email*', 'username*', 'password1*', 'password2*']
 LOGIN_REDIRECT_URL = '/dashboard/'
 
 SOCIALACCOUNT_PROVIDERS = {
