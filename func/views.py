@@ -19,6 +19,15 @@ class UserProfileView(RetrieveUpdateAPIView):
     def get_object(self):
         return self.request.user
 
+    def retrieve(self, request, *args, **kwargs):
+        user = self.get_object()
+        serializer = self.get_serializer(user)
+        return Response({
+            "message": "User Data",
+            "data": serializer.data,
+            "status": status.HTTP_200_OK
+        }, status=status.HTTP_200_OK)
+
 class ResumeUploadView(CreateAPIView):
     serializer_class = ResumeSerializer
     permission_classes = [permissions.IsAuthenticated]
@@ -35,12 +44,14 @@ class ResumeUploadView(CreateAPIView):
         session = InterviewSession.objects.create(user=self.request.user)
         self.session_id = session.id
     def create(self, request, *args, **kwargs):
-        resp = super().create(request, *args, **kwargs)
-        resp.data['session_id'] = str(self.session_id)
-        return resp
-
-from .parser import parse_resume_file, build_prompt, execute
-from .models import Question  # Assuming you have a Question model
+        super().create(request, *args, **kwargs)  # performs serializer.save() via perform_create
+        return Response({
+            "message": "Resume uploaded and parsed successfully",
+            "data": {
+                "session_id": str(self.session_id)
+            },
+            "status": status.HTTP_201_CREATED
+        }, status=status.HTTP_201_CREATED)
 
 class StartInterviewSessionView(APIView):
     permission_classes = [permissions.IsAuthenticated]
@@ -74,7 +85,14 @@ class StartInterviewSessionView(APIView):
         first_q = session.questions.order_by('created_at').first()
         question_data = QuestionSerializer(first_q).data if first_q else {}
 
-        return Response({'session': session_data, 'question': question_data}, status=status.HTTP_200_OK)
+        return Response({
+            "message": "Interview session started successfully",
+            "data": {
+                "session": session_data,
+                "question": question_data
+            },
+            "status": status.HTTP_200_OK
+        }, status=status.HTTP_200_OK)
 
 class NextQuestionView(APIView):
     permission_classes = [permissions.IsAuthenticated]
@@ -82,10 +100,21 @@ class NextQuestionView(APIView):
         session = get_object_or_404(InterviewSession, id=session_id, user=request.user)
         next_qs = session.questions.exclude(answers__isnull=False).order_by('created_at')
         if not next_qs.exists():
-            return Response({'detail': 'No more questions.'}, status=status.HTTP_204_NO_CONTENT)
-        q = next_qs.first()
-        return Response(QuestionSerializer(q).data, status=status.HTTP_200_OK)
+            return Response({
+                "message": "No more questions available",
+                "data": {},
+                "status": status.HTTP_204_NO_CONTENT
+            }, status=status.HTTP_204_NO_CONTENT)
 
+        q = next_qs.first()
+        question_data = QuestionSerializer(q).data
+
+        return Response({
+            "message": "Question retrieved successfully",
+            "data": question_data,
+            "status": status.HTTP_200_OK
+        }, status=status.HTTP_200_OK)
+        
 class SubmitAnswerView(CreateAPIView):
     serializer_class = AnswerSerializer
     parser_classes   = [JSONParser]
@@ -113,6 +142,15 @@ class SubmitAnswerView(CreateAPIView):
             session=question.session,
             message=f"Your answer for question '{question.text[:30]}…' was submitted and is being analyzed."
         )
+    
+    def create(self, request, *args, **kwargs):
+        # Override create to return custom response
+        response = super().create(request, *args, **kwargs)
+        return Response({
+            "message": "Answer submitted successfully and is being analyzed.",
+            "data": response.data,
+            "status": status.HTTP_201_CREATED
+        }, status=status.HTTP_201_CREATED)
 
 
 class SessionAnalysisView(APIView):
@@ -180,6 +218,15 @@ class InterviewHistoryView(ListAPIView):
     def get_queryset(self):
         return InterviewSession.objects.filter(user=self.request.user).order_by('-started_at')
     
+    def list(self, request, *args, **kwargs):
+        queryset = self.get_queryset()
+        serializer = self.get_serializer(queryset, many=True)
+        return Response({
+            "message": "Interview history retrieved successfully.",
+            "data": serializer.data,
+            "status": status.HTTP_200_OK
+        }, status=status.HTTP_200_OK)
+    
 class QuestionAdminViewSet(viewsets.ModelViewSet):
     """
     Admin-only CRUD for questions.
@@ -200,11 +247,62 @@ class QuestionAdminViewSet(viewsets.ModelViewSet):
             qs = qs.filter(category=cat)
         return qs
     
-class NotificationListView(generics.ListAPIView):
-    serializer_class   = NotificationSerializer
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        self.perform_create(serializer)
+
+        return Response({
+            "message": "Question created successfully.",
+            "data": serializer.data,
+            "status": status.HTTP_201_CREATED
+        }, status=status.HTTP_201_CREATED)
+
+    def retrieve(self, request, *args, **kwargs):
+        instance = self.get_object()
+        serializer = self.get_serializer(instance)
+
+        return Response({
+            "message": "Question retrieved successfully.",
+            "data": serializer.data,
+            "status": status.HTTP_200_OK
+        }, status=status.HTTP_200_OK)
+
+    def update(self, request, *args, **kwargs):
+        partial = kwargs.pop('partial', False)
+        instance = self.get_object()
+        serializer = self.get_serializer(instance, data=request.data, partial=partial)
+        serializer.is_valid(raise_exception=True)
+        self.perform_update(serializer)
+
+        return Response({
+            "message": "Question updated successfully.",
+            "data": serializer.data,
+            "status": status.HTTP_200_OK
+        }, status=status.HTTP_200_OK)
+
+    def destroy(self, request, *args, **kwargs):
+        instance = self.get_object()
+        self.perform_destroy(instance)
+
+        return Response({
+            "message": "Question deleted successfully.",
+            "data": None,
+            "status": status.HTTP_204_NO_CONTENT
+        }, status=status.HTTP_204_NO_CONTENT)
+    
+class NotificationListView(APIView):
     permission_classes = [permissions.IsAuthenticated]
-    def get_queryset(self):
-        return Notification.objects.filter(user=self.request.user).order_by('-created_at')
+
+    def get(self, request):
+        notifications = Notification.objects.filter(user=request.user).order_by('-created_at')
+        serializer = NotificationSerializer(notifications, many=True)
+        return Response({
+            "message": "Notifications fetched successfully.",
+            "data": serializer.data,
+            "status": status.HTTP_200_OK
+        }, status=status.HTTP_200_OK)
+        
 class NotificationMarkReadView(APIView):
     permission_classes = [permissions.IsAuthenticated]
     def post(self, request, notification_id):
@@ -212,9 +310,9 @@ class NotificationMarkReadView(APIView):
         notif.read = True
         notif.save()
         return Response({
-            "message": "read",
-            "data": "",
-            'status': 'read'
+            "message": "Notification marked as read.",
+            "data": {"notification_id": notif.id},
+            "status": status.HTTP_200_OK
         }, status=status.HTTP_200_OK)
         
     
@@ -234,4 +332,4 @@ class SignupView(generics.CreateAPIView):
             "message": "User registered successfully",
             "data": self.get_serializer(user).data,
             "status": status.HTTP_201_CREATED
-        }, status=status.HTTP_200_OK)
+        }, status=status.HTTP_201_CREATED)
