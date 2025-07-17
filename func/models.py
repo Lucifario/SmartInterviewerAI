@@ -83,8 +83,8 @@ class Answer(models.Model):
         on_delete=models.CASCADE,
         related_name='answers'
     )
-    audio_file = models.FileField(upload_to='answers/', blank=True, null=True)
-    transcript = models.TextField(blank=True, null=True)
+    # audio_file = models.FileField(upload_to='answers/', blank=True, null=True)
+    transcript = models.TextField(blank=False, null=False,default='')
     responded_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):

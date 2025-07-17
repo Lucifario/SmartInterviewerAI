@@ -74,7 +74,7 @@ class StartInterviewSessionView(APIView):
         first_q = session.questions.order_by('created_at').first()
         question_data = QuestionSerializer(first_q).data if first_q else {}
 
-        return Response({'session': session_data, 'first_question': question_data}, status=status.HTTP_200_OK)
+        return Response({'session': session_data, 'question': question_data}, status=status.HTTP_200_OK)
 
 class NextQuestionView(APIView):
     permission_classes = [permissions.IsAuthenticated]
@@ -90,15 +90,28 @@ class SubmitAnswerView(CreateAPIView):
     serializer_class = AnswerSerializer
     parser_classes   = [JSONParser]
     permission_classes = [permissions.IsAuthenticated]
+
     def perform_create(self, serializer):
-        question = get_object_or_404(Question, id=self.kwargs['question_id'], session__user=self.request.user)
-        answer   = serializer.save(question=question)
-        # **kick off** the full pipeline
+        question = get_object_or_404(
+            Question,
+            id=self.kwargs['question_id'],
+            session__user=self.request.user
+        )
+
+        transcript = self.request.data.get("transcript", "").strip()
+        if not transcript:
+            raise serializer.ValidationError({"transcript": "This field is required."})
+
+        answer = serializer.save(question=question)
+        
+        # Trigger async task
         async_task('func.tasks.full_answer_analysis', str(answer.id))
+
+        # Notify user
         Notification.objects.create(
-            user    = self.request.user,
-            session = question.session,
-            message = f"Your answer for question '{question.text[:30]}…' was submitted and is being analyzed."
+            user=self.request.user,
+            session=question.session,
+            message=f"Your answer for question '{question.text[:30]}…' was submitted and is being analyzed."
         )
 
 

@@ -55,8 +55,8 @@ class AnswerSerializer(serializers.ModelSerializer):
     analysis= AnswerAnalysisSerializer(read_only=True)
     class Meta:
         model= Answer
-        fields= ['id', 'audio_file', 'transcript', 'responded_at', 'analysis']
-        read_only_fields = ['id', 'transcript', 'responded_at', 'analysis']
+        fields= ['id', 'transcript', 'responded_at', 'analysis']
+        read_only_fields = ['id', 'responded_at', 'analysis']
 
 class InterviewHistorySerializer(serializers.ModelSerializer):
     total_questions     = serializers.SerializerMethodField()
