@@ -12,6 +12,8 @@ from .parser import parse_resume_file, execute
 from django.template.loader import render_to_string
 from django.http import HttpResponse
 from weasyprint import HTML
+from .parser import build_prompt
+
 
 class UserProfileView(RetrieveUpdateAPIView):
     serializer_class = UserSerializer
