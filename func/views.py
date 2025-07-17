@@ -113,7 +113,9 @@ class NextQuestionView(APIView):
 
         return Response({
             "message": "Question retrieved successfully",
-            "data": question_data,
+            "data": {
+                "question": question_data,
+            },
             "status": status.HTTP_200_OK
         }, status=status.HTTP_200_OK)
         
