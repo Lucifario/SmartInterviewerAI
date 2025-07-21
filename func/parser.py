@@ -66,13 +66,12 @@ def parse_resume_file(file_path):
     return structured_data
 
 
-model_id = "iarfmoose/t5-base-question-generator"
-tokenizer = AutoTokenizer.from_pretrained(model_id, use_fast=False)
-model = AutoModelForSeq2SeqLM.from_pretrained(model_id).to("cpu")
+model_name = "mrm8488/t5-base-finetuned-question-generation-ap"
+tokenizer = AutoTokenizer.from_pretrained(model_name)
+model = AutoModelForSeq2SeqLM.from_pretrained(model_name)
 
 # Create a prompt using resume and job info to generate questions
 def build_prompt(resume, job):
-    # Combine the structured resume info into a single input string
     resume_text = (
         f"Name: {resume.get('name')}. "
         f"Role: {resume.get('role')}. "
@@ -81,26 +80,35 @@ def build_prompt(resume, job):
         f"Education: {resume.get('education')}. "
         f"Job Role: {job.get('job')}."
     )
-
-    # Final input prompt for T5 model
+    
+    # Ask for a specific number of questions
     prompt = f"generate questions: {resume_text}"
     return prompt
 
 
-
 # Run the LLM to generate interview questions from the prompt
 def generate_questions(prompt):
-    inputs = tokenizer(prompt, return_tensors="pt").to("cpu")
+    inputs = tokenizer(prompt, return_tensors="pt", truncation=True).to("cpu")
+    
     outputs = model.generate(
         **inputs,
-        max_new_tokens=512,
-        do_sample=True,
-        temperature=0.7,
-        top_p=0.95,
-        repetition_penalty=1.15,
+        max_new_tokens=64,
+        num_return_sequences=5,         # <-- generate 5 questions
+        num_beams=5,                    # <-- beam search for better results
+        early_stopping=True,
+        do_sample=False,
         pad_token_id=tokenizer.eos_token_id
     )
-    return tokenizer.decode(outputs[0], skip_special_tokens=True)
+
+    # Decode all generated outputs
+    questions = [tokenizer.decode(output, skip_special_tokens=True).strip() for output in outputs]
+
+    # Sometimes a single output may contain multiple lines/questions
+    flat_questions = []
+    for q in questions:
+        flat_questions.extend([line.strip() for line in q.split('\n') if line.strip()])
+    
+    return flat_questions  # return a clean flat list of strings
 
 # resume_data = parse_resume_file(resume.file.path)
 # job ={"job": "Senior Backend Developer at Amazon"}  #under process

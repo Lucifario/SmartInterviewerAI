@@ -15,8 +15,8 @@ def full_answer_analysis(answer_id):
     answer = get_object_or_404(Answer, id=answer_id)
 
     # 1) Transcription
-    segments = transcribe(answer.audio_file.path)
-    full_text = " ".join([seg.split("]")[-1].strip() for seg in segments])
+    # segments = transcribe(answer.audio_file.path)
+    full_text = answer.transcript
     answer.transcript = full_text
     answer.save()
 

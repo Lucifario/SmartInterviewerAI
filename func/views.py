@@ -12,7 +12,8 @@ from .parser import parse_resume_file, execute
 from django.template.loader import render_to_string
 from django.http import HttpResponse
 from weasyprint import HTML
-from .parser import build_prompt
+from .parser import build_prompt, generate_questions
+from rest_framework.exceptions import ValidationError
 
 
 class UserProfileView(RetrieveUpdateAPIView):
@@ -58,31 +59,55 @@ class ResumeUploadView(CreateAPIView):
 class StartInterviewSessionView(APIView):
     permission_classes = [permissions.IsAuthenticated]
 
+    # Static questions fallback
+    FALLBACK_QUESTIONS = [
+        "Tell me about yourself.",
+        "Why are you interested in this role?",
+        "Describe a time you solved a complex backend issue.",
+        "What are your strengths as a developer?",
+        "How do you stay up-to-date with new backend technologies?"
+    ]
+
     def post(self, request, session_id):
         session = get_object_or_404(InterviewSession, id=session_id, user=request.user)
         resume = request.user.resume.order_by('-uploaded_at').first()
 
-        # 1. Parse the resume
-        parsed = parse_resume_file(resume.file.path)
-        resume.parsed_text = json.dumps(parsed)
-        resume.save()
+        if not resume:
+            return Response({
+                "message": "No resume found for this user.",
+                "data": {},
+                "status": status.HTTP_400_BAD_REQUEST
+            }, status=status.HTTP_400_BAD_REQUEST)
 
-        # 2. Generate questions only if session doesn't have them
+        try:
+            parsed = parse_resume_file(resume.file.path)
+            resume.parsed_text = json.dumps(parsed)
+            resume.save()
+        except Exception as e:
+            return Response({
+                "message": f"Resume parsing failed: {str(e)}",
+                "data": {},
+                "status": status.HTTP_500_INTERNAL_SERVER_ERROR
+            }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+        # Generate questions only if not already present
         if not session.questions.exists():
-            prompt = build_prompt(parsed, {"job": "Senior Backend Developer at Amazon"})  # Can be dynamic later
-            generated_output = execute(prompt)
+            try:
+                prompt = build_prompt(parsed, {"job": "Senior Backend Developer at Amazon"})
+                generated = generate_questions(prompt)
 
-            # 3. Extract actual questions from LLM output (after "Questions:\n1. ...")
-            questions_block = generated_output.split("Questions:")[-1].strip()
-            questions = [q.strip() for q in questions_block.split("\n") if q.strip()]
-            
-            for q in questions:
-                # Remove numbering like "1." or "2."
-                clean_q = q.lstrip("0123456789. ").strip()
-                if clean_q:
-                    Question.objects.create(session=session, text=clean_q)
+                # Ensure valid list
+                if not isinstance(generated, list) or not any(g.strip() for g in generated):
+                    generated = self.FALLBACK_QUESTIONS
+            except Exception as e:
+                generated = self.FALLBACK_QUESTIONS  # Use fallback if LLM fails
 
-        # 4. Return session and first question
+            for q in generated:
+                q = q.strip()
+                if q:
+                    Question.objects.create(session=session, text=q)
+
+        # Return session and first question
         session_data = InterviewSessionSerializer(session).data
         first_q = session.questions.order_by('created_at').first()
         question_data = QuestionSerializer(first_q).data if first_q else {}
@@ -95,6 +120,7 @@ class StartInterviewSessionView(APIView):
             },
             "status": status.HTTP_200_OK
         }, status=status.HTTP_200_OK)
+
 
 class NextQuestionView(APIView):
     permission_classes = [permissions.IsAuthenticated]
@@ -133,7 +159,7 @@ class SubmitAnswerView(CreateAPIView):
 
         transcript = self.request.data.get("transcript", "").strip()
         if not transcript:
-            raise serializer.ValidationError({"transcript": "This field is required."})
+            raise ValidationError({"transcript": "This field is required."})
 
         answer = serializer.save(question=question)
         

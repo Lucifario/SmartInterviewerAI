@@ -7,18 +7,17 @@ sign up
 
 
 auth
-{"access":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzUyMDczMTc2LCJpYXQiOjE3NTE5OTE5OTMsImp0aSI6ImY0OGMxMTNkODJmOTQ0NjQ5Y2I1YmVjNmM3YTAyZjg0IiwidXNlcl9pZCI6Nn0.sHC91kgAFACZDzbPcdwNj3iYmcN3fzOs60eGEgeKs1Q","refresh":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoicmVmcmVzaCIsImV4cCI6MTc1MjE0ODc3NiwiaWF0IjoxNzUyMDYyMzc2LCJqdGkiOiJjZjY1NWI5ZDk2ZDU0YTYwOWE3ZGRiZjMyZDBmMjI3NiIsInVzZXJfaWQiOjZ9.4CbzrJvlYz7LMLC5cLKks-QnkM8ZeNLJwGxIdynxRMk"}
-
+{"refresh":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoicmVmcmVzaCIsImV4cCI6MTc1MzYxNjI4MywiaWF0IjoxNzUyNzUyMjgzLCJqdGkiOiI5YjQwYjBkMDhiMDM0NWZiOWJjYWE3MjExMjk5NDQxZCIsInVzZXJfaWQiOjZ9.XsJUy1ltVG3l65GNd6Gd87RdEViCaGhmELSMmv0A5hA","access":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzUzNjE2MjgzLCJpYXQiOjE3NTI3NTIyODMsImp0aSI6IjY3OGQxNDc2YTBlZjQ2ZDk4NGJlNGM0ODI5MTg2NDljIiwidXNlcl9pZCI6Nn0.GT2uRdMAcxfXaLKwG0CDeSA8ZDYL9QGzq31a2LBK78Y"}
 
 resume upload
-{"id":2,"file":"http://127.0.0.1:8000/media/resume/GouravMittalResume.pdf","parsed_text":"{\"name\": \"Gourav Mittal\", \"role\": \"\", \"skills\": \"\", \"experience\": \"\", \"education\": \"B.Tech in Computer Science, University of Petroleum and Energy Studies (Dehradun)\"}","uploaded_at":"2025-07-08T22:11:26.579449+05:30","session_id":"3e99e03c-1473-4b07-b105-eb79ebbe83ba"}
+{"message":"Resume uploaded and parsed successfully","data":{"session_id":"9a2e5ef2-6154-4dd6-94c4-dd8d4d5485bf"},"status":201}
 
 session start
-{"session":{"id":"3e99e03c-1473-4b07-b105-eb79ebbe83ba","started_at":"2025-07-08T22:11:33.889698+05:30","finished_at":null},"first_question":{"id":"7de9d4a4-7720-408b-89cb-d4c50457a11e","session":"3e99e03c-1473-4b07-b105-eb79ebbe83ba","text":"How is the software in the .NET language?","created_at":"2025-07-08T22:15:14.104446+05:30"}}
+{"message":"Interview session started successfully","data":{"session":{"id":"9a2e5ef2-6154-4dd6-94c4-dd8d4d5485bf","started_at":"2025-07-21T13:08:50.532920+05:30","finished_at":null},"question":{"id":"e644beab-4486-4fdb-8080-65c741a9415d","session":"9a2e5ef2-6154-4dd6-94c4-dd8d4d5485bf","text":"question: Who is the Senior Backend Developer at Amazon?","created_at":"2025-07-21T13:09:59.792458+05:30"}},"status":200}
 
 next
 {"id":"7de9d4a4-7720-408b-89cb-d4c50457a11e","session":"3e99e03c-1473-4b07-b105-eb79ebbe83ba","text":"How is the software in the .NET language?","created_at":"2025-07-08T22:15:14.104446+05:30"}
 
 submit answer
-{"id":"ab420742-47ec-4698-816f-2314c6b039e1","audio_file":null,"transcript":null,"responded_at":"2025-07-09T17:32:30.475671+05:30","analysis":null}
+{"message":"Answer submitted successfully and is being analyzed.","data":{"id":"ac343f76-f164-4db3-9b24-22d3f2ccb70f","transcript":"The Senior Backend Developer at Amazon is John Doe.","responded_at":"2025-07-21T13:15:47.470195+05:30","analysis":null},"status":201}
 
